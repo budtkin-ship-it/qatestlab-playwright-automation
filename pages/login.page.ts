@@ -7,6 +7,7 @@ export class LoginPage {
   readonly passwordInput: Locator;
   readonly loginButton: Locator;
   readonly errorAlert: Locator;
+  readonly dashboardHeading: Locator;
 
   constructor(private readonly page: Page) {
     this.heading = page.getByRole('heading', { name: 'Login', exact: true });
@@ -15,6 +16,7 @@ export class LoginPage {
     this.passwordInput = page.getByPlaceholder('Password', { exact: true });
     this.loginButton = page.getByRole('button', { name: 'Login', exact: true });
     this.errorAlert = page.getByRole('alert');
+    this.dashboardHeading = page.getByRole('heading', { name: 'Dashboard', exact: true });
   }
 
   async goto(): Promise<void> {
@@ -24,6 +26,18 @@ export class LoginPage {
   async login(credentials: Credentials): Promise<void> {
     await this.usernameInput.fill(credentials.username);
     await this.passwordInput.fill(credentials.password);
-    await this.loginButton.click();
+    // Successful flows synchronize the redirect explicitly in waitForDashboard;
+    // keep the click's action timeout separate from the server's navigation.
+    await this.loginButton.click({ noWaitAfter: true });
+  }
+
+  async waitForDashboard(): Promise<void> {
+    // Form submission can start after click resolves; use the navigation budget
+    // before tests assert the final URL and rendered Dashboard.
+    await this.page.waitForURL('/web/index.php/dashboard/index', { waitUntil: 'domcontentloaded' });
+  }
+
+  async gotoDashboard(): Promise<void> {
+    await this.page.goto('/web/index.php/dashboard/index');
   }
 }

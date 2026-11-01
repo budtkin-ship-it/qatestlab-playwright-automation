@@ -19,7 +19,7 @@ export default defineConfig({
   ],
   use: {
     baseURL: process.env.BASE_URL?.trim() || 'https://opensource-demo.orangehrmlive.com/',
-    headless: true,
+    headless: !!process.env.CI,
     actionTimeout: 10_000,
     navigationTimeout: 30_000,
     // Login traces can contain credentials. Enable locally only when needed.

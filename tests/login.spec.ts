@@ -5,9 +5,10 @@ test('valid user can log in @smoke', async ({ page, loginPage, credentials }) =>
   await expect(loginPage.heading).toBeVisible();
 
   await loginPage.login(credentials);
+  await loginPage.waitForDashboard();
 
   await expect(page).toHaveURL('/web/index.php/dashboard/index');
-  await expect(page.getByRole('heading', { name: 'Dashboard', exact: true })).toBeVisible();
+  await expect(loginPage.dashboardHeading).toBeVisible();
 });
 
 test('invalid credentials show an error and do not authenticate', async ({ page, loginPage }) => {
@@ -19,6 +20,6 @@ test('invalid credentials show an error and do not authenticate', async ({ page,
   await expect(page).toHaveURL('/web/index.php/auth/login');
 
   // A protected page must remain inaccessible after the rejected login.
-  await page.goto('/web/index.php/dashboard/index');
+  await loginPage.gotoDashboard();
   await expect(page).toHaveURL('/web/index.php/auth/login');
 });
