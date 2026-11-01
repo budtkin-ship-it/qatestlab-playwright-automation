@@ -1,5 +1,6 @@
 import type { Locator, Page } from '@playwright/test';
 import type { Credentials } from '../test-data/credentials';
+import { routes } from '../utils/routes';
 
 export class LoginPage {
   readonly heading: Locator;
@@ -20,24 +21,21 @@ export class LoginPage {
   }
 
   async goto(): Promise<void> {
-    await this.page.goto('/web/index.php/auth/login');
+    await this.page.goto(routes.login);
   }
 
+  // Login can succeed or fail, so this method does not return a DashboardPage.
   async login(credentials: Credentials): Promise<void> {
     await this.usernameInput.fill(credentials.username);
     await this.passwordInput.fill(credentials.password);
-    // Successful flows synchronize the redirect explicitly in waitForDashboard;
-    // keep the click's action timeout separate from the server's navigation.
     await this.loginButton.click({ noWaitAfter: true });
   }
 
   async waitForDashboard(): Promise<void> {
-    // Form submission can start after click resolves; use the navigation budget
-    // before tests assert the final URL and rendered Dashboard.
-    await this.page.waitForURL('/web/index.php/dashboard/index', { waitUntil: 'domcontentloaded' });
+    await this.page.waitForURL(routes.dashboard, { waitUntil: 'domcontentloaded' });
   }
 
   async gotoDashboard(): Promise<void> {
-    await this.page.goto('/web/index.php/dashboard/index');
+    await this.page.goto(routes.dashboard);
   }
 }
