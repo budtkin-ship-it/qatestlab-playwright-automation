@@ -88,7 +88,7 @@ npm run report
 ```
 
 Use Inspector's Resume and Step over controls to continue debugging.
-Other scripts: `test:smoke`, `test:headed`, `test:ui`, and `test:list`.
+Other scripts: `test:headed`, `test:ui`, and `test:list`.
 HTML reports are in `playwright-report/`; failure screenshots and generated
 test files are in `test-results/`. Both directories are ignored by Git.
 Review artifacts before sharing: they can contain account information.
