@@ -101,6 +101,7 @@ pages/                   # UI locators and actions
 fixtures/test.ts         # Page fixtures, test data, and cleanup
 test-data/credentials.ts # Environment-backed credentials
 utils/env.ts             # .env loading and required-value checks
+utils/routes.ts          # Shared application routes
 playwright.config.ts     # Browser, timeouts, retries, and reporters
 tsconfig.json            # Strict TypeScript settings
 package-lock.json        # Locked dependency versions
