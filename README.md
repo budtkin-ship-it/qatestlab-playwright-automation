@@ -1,7 +1,8 @@
 # OrangeHRM E2E automation
 
 A small Playwright Test + TypeScript project for the QATestLab hiring assignment.
-Sections 2.1 (Login), 2.2 (User Management), and 2.3 (My Info Attachments) are implemented against the
+Sections 2.1 (Login), 2.2 (User Management), 2.3 (My Info Attachments), and
+2.4 (Dashboard Data Validation) are implemented against the
 [OrangeHRM demo](https://opensource-demo.orangehrmlive.com/).
 
 - Valid credentials open the Dashboard (tagged `@smoke`).
@@ -13,6 +14,9 @@ Sections 2.1 (Login), 2.2 (User Management), and 2.3 (My Info Attachments) are i
 - The Attachments scenario uploads a UUID-named text file with a description,
   verifies the downloaded filename and bytes, then deletes the attachment and
   checks its absence after reloading the same employee profile.
+- The Dashboard scenario validates the Sub Unit and Location employee-distribution
+  pie charts, their visible category labels, and the absence of labels belonging
+  to the other chart dimension.
 
 ## Installation
 
@@ -102,6 +106,12 @@ npm test -- tests/users.spec.ts
 npm test -- tests/attachments.spec.ts
 ```
 
+**Dashboard test:**
+
+```sh
+npm test -- tests/dashboard.spec.ts
+```
+
 **Debug all tests with Playwright Inspector:**
 
 ```sh
@@ -124,6 +134,12 @@ npm run test:debug -- tests/users.spec.ts
 
 ```sh
 npm run test:debug -- tests/attachments.spec.ts
+```
+
+**Debug Dashboard:**
+
+```sh
+npm run test:debug -- tests/dashboard.spec.ts
 ```
 
 Use Inspector's Resume and Step over controls to continue execution.
@@ -160,6 +176,16 @@ filename on the captured My Info profile; it leaves pre-existing attachments
 alone. Demo outages, session loss, or concurrent profile changes can still
 prevent cleanup, which is reported as a teardown failure.
 
+Dashboard validation is read-only and uses the real chart legends. It expects
+`Engineering` and `Unassigned` in the Sub Unit chart, and `Texas R&D` and
+`Unassigned` in the Location chart. Negative assertions reject `Texas R&D` in
+the Sub Unit legend and `Engineering` in the Location legend. These categories
+were observed on the live demo; renaming organizational units/locations or
+reassigning all employees can legitimately change the expected labels. Employee
+counts and slice percentages are not fixed or asserted. The charts have unlabeled
+canvases, so the test scopes them by their visible widget titles and validates
+the DOM legends; it does not verify pixel rendering or backend aggregation.
+
 ## Project structure
 
 ```text
@@ -167,10 +193,12 @@ tests/
   login.spec.ts          # Positive and negative Login tests
   users.spec.ts          # Create, verify, update, and delete a test-owned user
   attachments.spec.ts    # Upload, verify download, and delete a test-owned file
+  dashboard.spec.ts      # Employee-distribution chart labels and negative checks
 pages/
   login.page.ts          # Login locators and user actions
   users.page.ts          # Users form, table, and scoped account actions
   attachments.page.ts    # My Info attachment upload, download, and deletion
+  dashboard.page.ts      # Scoped chart canvases and visible legend labels
 fixtures/
   test.ts                # Page objects, credentials, test data, and cleanup
 test-data/
@@ -186,5 +214,5 @@ Add scenarios under `tests/`, keep page-specific locators/actions in `pages/`,
 and use fixtures only for reusable setup. Prefer accessible roles/placeholders
 and Playwright web-first assertions; avoid fixed sleeps and brittle selectors.
 Use two-space indentation, single quotes, semicolons, and explicit types at
-module boundaries. Only assignment sections 2.1, 2.2, and 2.3 are implemented. Remaining
+module boundaries. Only assignment sections 2.1 through 2.4 are implemented. Remaining
 assignment sections, a CI workflow, and extra framework layers are not included.

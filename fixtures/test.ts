@@ -2,6 +2,7 @@ import { test as base } from '@playwright/test';
 import { randomUUID } from 'node:crypto';
 import { writeFile } from 'node:fs/promises';
 import { AttachmentsPage } from '../pages/attachments.page';
+import { DashboardPage } from '../pages/dashboard.page';
 import { LoginPage } from '../pages/login.page';
 import { UsersPage } from '../pages/users.page';
 import { getCredentials, type Credentials } from '../test-data/credentials';
@@ -9,6 +10,7 @@ import { getCredentials, type Credentials } from '../test-data/credentials';
 interface TestFixtures {
   loginPage: LoginPage;
   credentials: Credentials;
+  dashboardPage: DashboardPage;
   usersPage: UsersPage;
   userAccount: Credentials;
   attachmentsPage: AttachmentsPage;
@@ -27,6 +29,10 @@ export const test = base.extend<TestFixtures>({
 
   credentials: async ({}, use) => {
     await use(getCredentials());
+  },
+
+  dashboardPage: async ({ page }, use) => {
+    await use(new DashboardPage(page));
   },
 
   usersPage: async ({ page }, use) => {

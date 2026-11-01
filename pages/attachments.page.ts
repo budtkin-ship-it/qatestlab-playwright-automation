@@ -2,7 +2,7 @@ import type { Download, Locator, Page } from '@playwright/test';
 import path from 'node:path';
 
 export class AttachmentsPage {
-  private readonly section: Locator;
+  private readonly attachmentsSection: Locator;
   private readonly heading: Locator;
   private readonly myInfoLink: Locator;
   private readonly fileNameColumn: Locator;
@@ -15,15 +15,14 @@ export class AttachmentsPage {
   private submittedFilename?: string;
 
   constructor(private readonly page: Page) {
-    this.section = page.locator('.orangehrm-attachment');
-    this.heading = this.section.getByRole('heading', { name: 'Attachments', exact: true });
+    this.attachmentsSection = page.locator('.orangehrm-attachment');
+    this.heading = this.attachmentsSection.getByRole('heading', { name: 'Attachments', exact: true });
     this.myInfoLink = page.getByRole('link', { name: 'My Info', exact: true });
-    this.fileNameColumn = this.section.getByRole('columnheader', { name: 'File Name', exact: true });
-    this.addButton = this.section.getByRole('button', { name: 'Add' });
-    // The hidden file input has no associated label in the actual form.
-    this.fileInput = this.section.locator('input[type="file"]');
-    this.commentInput = this.section.getByPlaceholder('Type comment here', { exact: true });
-    this.saveButton = this.section.getByRole('button', { name: 'Save', exact: true });
+    this.fileNameColumn = this.attachmentsSection.getByRole('columnheader', { name: 'File Name', exact: true });
+    this.addButton = this.attachmentsSection.getByRole('button', { name: 'Add' });
+    this.fileInput = this.attachmentsSection.locator('input[type="file"]');
+    this.commentInput = this.attachmentsSection.getByPlaceholder('Type comment here', { exact: true });
+    this.saveButton = this.attachmentsSection.getByRole('button', { name: 'Save', exact: true });
     this.confirmDeleteButton = page.getByRole('dialog').getByRole('button', { name: 'Yes, Delete' });
     this.deleteSuccessMessage = page.getByText('Successfully Deleted', { exact: true });
   }
@@ -35,7 +34,7 @@ export class AttachmentsPage {
   }
 
   attachmentRow(filename: string): Locator {
-    return this.section.getByRole('row').filter({
+    return this.attachmentsSection.getByRole('row').filter({
       has: this.page.getByRole('cell', { name: filename, exact: true }),
     });
   }
