@@ -1,7 +1,7 @@
 # OrangeHRM E2E automation
 
 A small Playwright Test + TypeScript project for the QATestLab hiring assignment.
-Sections 2.1 (Login) and 2.2 (User Management) are implemented against the
+Sections 2.1 (Login), 2.2 (User Management), and 2.3 (My Info Attachments) are implemented against the
 [OrangeHRM demo](https://opensource-demo.orangehrmlive.com/).
 
 - Valid credentials open the Dashboard (tagged `@smoke`).
@@ -10,6 +10,9 @@ Sections 2.1 (Login) and 2.2 (User Management) are implemented against the
 - The Users scenario creates a unique ESS account, verifies its details, changes
   its status to Disabled, and deletes it. Employee selection uses a live
   autocomplete suggestion, without creating or editing an employee.
+- The Attachments scenario uploads a UUID-named text file with a description,
+  verifies the downloaded filename and bytes, then deletes the attachment and
+  checks its absence after reloading the same employee profile.
 
 ## Installation
 
@@ -93,6 +96,12 @@ npm test -- tests/login.spec.ts
 npm test -- tests/users.spec.ts
 ```
 
+**Attachments test:**
+
+```sh
+npm test -- tests/attachments.spec.ts
+```
+
 **Debug all tests with Playwright Inspector:**
 
 ```sh
@@ -109,6 +118,12 @@ npm run test:debug -- tests/login.spec.ts
 
 ```sh
 npm run test:debug -- tests/users.spec.ts
+```
+
+**Debug Attachments:**
+
+```sh
+npm run test:debug -- tests/attachments.spec.ts
 ```
 
 Use Inspector's Resume and Step over controls to continue execution.
@@ -136,17 +151,28 @@ if the demo is unavailable or the Admin session is lost; teardown errors remain
 visible in the test results. The scenario needs an autocomplete result with a
 first/last name when searching `a`, since the list omits employee middle names.
 
+The Attachments fixture creates a small UTF-8 file in the ignored test output
+directory, with a UUID filename, description, and run-specific contents. Upload
+uses `setInputFiles`; download uses Playwright's download event and compares the
+original filename and complete file contents. A separate 30-second teardown
+budget allows cleanup after failures. Cleanup targets only the submitted UUID
+filename on the captured My Info profile; it leaves pre-existing attachments
+alone. Demo outages, session loss, or concurrent profile changes can still
+prevent cleanup, which is reported as a teardown failure.
+
 ## Project structure
 
 ```text
 tests/
   login.spec.ts          # Positive and negative Login tests
   users.spec.ts          # Create, verify, update, and delete a test-owned user
+  attachments.spec.ts    # Upload, verify download, and delete a test-owned file
 pages/
   login.page.ts          # Login locators and user actions
   users.page.ts          # Users form, table, and scoped account actions
+  attachments.page.ts    # My Info attachment upload, download, and deletion
 fixtures/
-  test.ts                # Page objects, credentials, test account, and cleanup
+  test.ts                # Page objects, credentials, test data, and cleanup
 test-data/
   credentials.ts         # Credential type and environment-backed data
 utils/
@@ -160,5 +186,5 @@ Add scenarios under `tests/`, keep page-specific locators/actions in `pages/`,
 and use fixtures only for reusable setup. Prefer accessible roles/placeholders
 and Playwright web-first assertions; avoid fixed sleeps and brittle selectors.
 Use two-space indentation, single quotes, semicolons, and explicit types at
-module boundaries. Only assignment sections 2.1 and 2.2 are implemented. Remaining
+module boundaries. Only assignment sections 2.1, 2.2, and 2.3 are implemented. Remaining
 assignment sections, a CI workflow, and extra framework layers are not included.
