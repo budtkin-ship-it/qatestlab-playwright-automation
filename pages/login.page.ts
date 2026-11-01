@@ -3,12 +3,12 @@ import type { Credentials } from '../test-data/credentials';
 import { routes } from '../utils/routes';
 
 export class LoginPage {
-  readonly heading: Locator;
-  readonly usernameInput: Locator;
-  readonly passwordInput: Locator;
-  readonly loginButton: Locator;
-  readonly errorAlert: Locator;
-  readonly dashboardHeading: Locator;
+  private readonly heading: Locator;
+  private readonly usernameInput: Locator;
+  private readonly passwordInput: Locator;
+  private readonly loginButton: Locator;
+  private readonly errorAlert: Locator;
+  private readonly dashboardHeading: Locator;
 
   constructor(private readonly page: Page) {
     this.heading = page.getByRole('heading', { name: 'Login', exact: true });
@@ -18,6 +18,18 @@ export class LoginPage {
     this.loginButton = page.getByRole('button', { name: 'Login', exact: true });
     this.errorAlert = page.getByRole('alert');
     this.dashboardHeading = page.getByRole('heading', { name: 'Dashboard', exact: true });
+  }
+
+  getHeading(): Locator {
+    return this.heading;
+  }
+
+  getDashboardHeading(): Locator {
+    return this.dashboardHeading;
+  }
+
+  getErrorAlert(): Locator {
+    return this.errorAlert;
   }
 
   async goto(): Promise<void> {

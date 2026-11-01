@@ -7,7 +7,7 @@ test('validate employee distribution by sub unit', async ({
   await loginPage.login(credentials);
   await loginPage.waitForDashboard();
 
-  await expect(dashboardPage.subUnitChart).toBeVisible();
+  await expect(dashboardPage.getSubUnitChart()).toBeVisible();
   await expect.soft(dashboardPage.subUnitLabel('Engineering')).toBeVisible();
   await expect.soft(dashboardPage.subUnitLabel('Unassigned')).toBeVisible();
   await expect.soft(dashboardPage.subUnitLabel('Texas R&D')).not.toBeVisible();
@@ -20,7 +20,7 @@ test('validate employee distribution by location', async ({
   await loginPage.login(credentials);
   await loginPage.waitForDashboard();
 
-  await expect(dashboardPage.locationChart).toBeVisible();
+  await expect(dashboardPage.getLocationChart()).toBeVisible();
   await expect.soft(dashboardPage.locationLabel('Texas R&D')).toBeVisible();
   await expect.soft(dashboardPage.locationLabel('Unassigned')).toBeVisible();
 

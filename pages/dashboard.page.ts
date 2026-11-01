@@ -1,8 +1,8 @@
 import type { Locator, Page } from '@playwright/test';
 
 export class DashboardPage {
-  readonly subUnitChart: Locator;
-  readonly locationChart: Locator;
+  private readonly subUnitChart: Locator;
+  private readonly locationChart: Locator;
   private readonly subUnitLegend: Locator;
   private readonly locationLegend: Locator;
 
@@ -18,6 +18,14 @@ export class DashboardPage {
     this.locationChart = employeeDistributionByLocationWidget.locator('canvas');
     this.subUnitLegend = employeeDistributionBySubUnitWidget.getByRole('list');
     this.locationLegend = employeeDistributionByLocationWidget.getByRole('list');
+  }
+
+  getSubUnitChart(): Locator {
+    return this.subUnitChart;
+  }
+
+  getLocationChart(): Locator {
+    return this.locationChart;
   }
 
   subUnitLabel(name: string): Locator {

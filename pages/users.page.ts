@@ -5,9 +5,9 @@ type UserRole = 'Admin' | 'ESS';
 type UserStatus = 'Enabled' | 'Disabled';
 
 export class UsersPage {
-  readonly heading: Locator;
-  readonly usernameInput: Locator;
-  readonly noRecords: Locator;
+  private readonly heading: Locator;
+  private readonly usernameInput: Locator;
+  private readonly noRecords: Locator;
   private readonly roleDropdown: Locator;
   private readonly statusDropdown: Locator;
   private readonly employeeInput: Locator;
@@ -59,6 +59,14 @@ export class UsersPage {
     this.deleteIcon = page.locator('.bi-trash');
   }
 
+  getUsernameInput(): Locator {
+    return this.usernameInput;
+  }
+
+  getNoRecordsMessage(): Locator {
+    return this.noRecords;
+  }
+
   async open(): Promise<void> {
     await this.adminLink.click();
     await this.userManagementMenu.click();
@@ -84,11 +92,11 @@ export class UsersPage {
     return this.userRow(username).getByRole('cell').nth(4);
   }
 
-  editButton(username: string): Locator {
+  private editButton(username: string): Locator {
     return this.userRow(username).getByRole('button').filter({ has: this.editIcon });
   }
 
-  deleteButton(username: string): Locator {
+  private deleteButton(username: string): Locator {
     return this.userRow(username).getByRole('button').filter({ has: this.deleteIcon });
   }
 
@@ -126,7 +134,7 @@ export class UsersPage {
     await this.editButton(username).click();
   }
 
-  async selectUserRole(role: UserRole): Promise<void> {
+  private async selectUserRole(role: UserRole): Promise<void> {
     await this.roleDropdown.click();
     await this.page.getByRole('option', { name: role, exact: true }).click();
   }
@@ -136,7 +144,7 @@ export class UsersPage {
     await this.page.getByRole('option', { name: status, exact: true }).click();
   }
 
-  async selectEmployee(searchText: string): Promise<string> {
+  private async selectEmployee(searchText: string): Promise<string> {
     await this.employeeInput.fill(searchText);
     // Loading/empty placeholders do not match; the Users table omits middle names.
     const suggestion = this.employeeSuggestions.filter({ hasText: /^\S+\s+\S+$/ }).first();

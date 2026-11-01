@@ -16,7 +16,7 @@ test('create, update, and delete a system user', async ({
   await expect.soft(usersPage.userStatus(userAccount.username)).toHaveText('Enabled');
 
   await usersPage.editUser(userAccount.username);
-  await expect(usersPage.usernameInput).toHaveValue(userAccount.username);
+  await expect(usersPage.getUsernameInput()).toHaveValue(userAccount.username);
   await usersPage.selectStatus('Disabled');
   await usersPage.save();
   await usersPage.search(userAccount.username);
@@ -24,6 +24,6 @@ test('create, update, and delete a system user', async ({
 
   await usersPage.deleteUser(userAccount.username);
   await usersPage.search(userAccount.username);
-  await expect.soft(usersPage.noRecords).toBeVisible();
+  await expect.soft(usersPage.getNoRecordsMessage()).toBeVisible();
   await expect.soft(usersPage.userRow(userAccount.username)).toHaveCount(0);
 });

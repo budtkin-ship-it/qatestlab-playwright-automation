@@ -3,13 +3,13 @@ import type { Locator, Page } from '@playwright/test';
 type VacancyStatus = 'Active' | 'Closed';
 
 export class VacanciesPage {
-  readonly rows: Locator;
-  readonly resultVacancyName: Locator;
-  readonly resultJobTitle: Locator;
-  readonly resultStatus: Locator;
-  readonly vacancyDropdown: Locator;
-  readonly statusDropdown: Locator;
-  readonly noRecords: Locator;
+  private readonly rows: Locator;
+  private readonly resultVacancyName: Locator;
+  private readonly resultJobTitle: Locator;
+  private readonly resultStatus: Locator;
+  private readonly vacancyDropdown: Locator;
+  private readonly statusDropdown: Locator;
+  private readonly noRecords: Locator;
   private readonly recruitmentLink: Locator;
   private readonly vacanciesLink: Locator;
   private readonly resultHeader: Locator;
@@ -39,6 +39,34 @@ export class VacanciesPage {
     // The same message also appears in a toast paragraph; target the table summary.
     this.noRecords = page.getByText('No Records Found', { exact: true })
       .and(page.locator('span.oxd-text--span'));
+  }
+
+  getRows(): Locator {
+    return this.rows;
+  }
+
+  getResultVacancyName(): Locator {
+    return this.resultVacancyName;
+  }
+
+  getResultJobTitle(): Locator {
+    return this.resultJobTitle;
+  }
+
+  getResultStatus(): Locator {
+    return this.resultStatus;
+  }
+
+  getVacancyDropdown(): Locator {
+    return this.vacancyDropdown;
+  }
+
+  getStatusDropdown(): Locator {
+    return this.statusDropdown;
+  }
+
+  getNoRecordsMessage(): Locator {
+    return this.noRecords;
   }
 
   async open(): Promise<void> {
