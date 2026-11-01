@@ -5,12 +5,14 @@ import { AttachmentsPage } from '../pages/attachments.page';
 import { DashboardPage } from '../pages/dashboard.page';
 import { LoginPage } from '../pages/login.page';
 import { UsersPage } from '../pages/users.page';
+import { VacanciesPage } from '../pages/vacancies.page';
 import { getCredentials, type Credentials } from '../test-data/credentials';
 
 interface TestFixtures {
   loginPage: LoginPage;
   credentials: Credentials;
   dashboardPage: DashboardPage;
+  vacanciesPage: VacanciesPage;
   usersPage: UsersPage;
   userAccount: Credentials;
   attachmentsPage: AttachmentsPage;
@@ -33,6 +35,10 @@ export const test = base.extend<TestFixtures>({
 
   dashboardPage: async ({ page }, use) => {
     await use(new DashboardPage(page));
+  },
+
+  vacanciesPage: async ({ page }, use) => {
+    await use(new VacanciesPage(page));
   },
 
   usersPage: async ({ page }, use) => {
