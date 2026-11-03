@@ -9,6 +9,8 @@ export class LoginPage {
   private readonly loginButton: Locator;
   private readonly errorAlert: Locator;
   private readonly dashboardHeading: Locator;
+  private readonly usernameRequiredMessage: Locator;
+  private readonly passwordRequiredMessage: Locator;
 
   constructor(private readonly page: Page) {
     this.heading = page.getByRole('heading', { name: 'Login', exact: true });
@@ -18,6 +20,10 @@ export class LoginPage {
     this.loginButton = page.getByRole('button', { name: 'Login', exact: true });
     this.errorAlert = page.getByRole('alert');
     this.dashboardHeading = page.getByRole('heading', { name: 'Dashboard', exact: true });
+    this.usernameRequiredMessage = page.locator('.oxd-input-group')
+      .filter({ has: this.usernameInput }).getByText('Required', { exact: true });
+    this.passwordRequiredMessage = page.locator('.oxd-input-group')
+      .filter({ has: this.passwordInput }).getByText('Required', { exact: true });
   }
 
   getHeading(): Locator {
@@ -30,6 +36,14 @@ export class LoginPage {
 
   getErrorAlert(): Locator {
     return this.errorAlert;
+  }
+
+  getUsernameRequiredMessage(): Locator {
+    return this.usernameRequiredMessage;
+  }
+
+  getPasswordRequiredMessage(): Locator {
+    return this.passwordRequiredMessage;
   }
 
   async goto(): Promise<void> {
