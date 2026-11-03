@@ -1,4 +1,5 @@
 import { test, expect } from '../fixtures/test';
+import { negativeDashboardLabels } from '../test-data/dashboard';
 
 test('validate employee distribution by sub unit', async ({
   loginPage, credentials, dashboardPage,
@@ -10,7 +11,7 @@ test('validate employee distribution by sub unit', async ({
   await expect(dashboardPage.getSubUnitChart()).toBeVisible();
   await expect.soft(dashboardPage.subUnitLabel('Engineering')).toBeVisible();
   await expect.soft(dashboardPage.subUnitLabel('Unassigned')).toBeVisible();
-  await expect.soft(dashboardPage.subUnitLabel('Texas R&D')).not.toBeVisible();
+  await expect.soft(dashboardPage.subUnitLabel(negativeDashboardLabels.subUnit)).not.toBeVisible();
 });
 
 test('validate employee distribution by location', async ({
@@ -24,5 +25,5 @@ test('validate employee distribution by location', async ({
   await expect.soft(dashboardPage.locationLabel('Texas R&D')).toBeVisible();
   await expect.soft(dashboardPage.locationLabel('Unassigned')).toBeVisible();
 
-  await expect.soft(dashboardPage.locationLabel('Engineering')).not.toBeVisible();
+  await expect.soft(dashboardPage.locationLabel(negativeDashboardLabels.location)).not.toBeVisible();
 });
