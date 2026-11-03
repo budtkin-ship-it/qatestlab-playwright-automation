@@ -1,6 +1,25 @@
 import { test, expect } from '../fixtures/test';
 
-test('vacancy search returns records matching the selected filters', async ({
+test('vacancy search returns records matching the selected job title', async ({
+  loginPage, credentials, vacanciesPage,
+}) => {
+  await loginPage.goto();
+  await loginPage.login(credentials);
+  await loginPage.waitForDashboard();
+  await vacanciesPage.open();
+  await expect(vacanciesPage.getRows()).not.toHaveCount(0);
+  const vacancy = await vacanciesPage.readVacancyWithAvailableJobTitle();
+  await vacanciesPage.selectJobTitle(vacancy.jobTitle);
+  await vacanciesPage.search();
+
+  await expect(vacanciesPage.getRows()).not.toHaveCount(0);
+  const rowCount = await vacanciesPage.getRows().count();
+  for (let rowIndex = 0; rowIndex < rowCount; rowIndex++) {
+    await expect.soft(vacanciesPage.getResultJobTitle(rowIndex)).toHaveText(vacancy.jobTitle);
+  }
+});
+
+test('vacancy search returns records matching the selected vacancy', async ({
   loginPage, credentials, vacanciesPage,
 }) => {
   await loginPage.goto();
@@ -10,15 +29,34 @@ test('vacancy search returns records matching the selected filters', async ({
 
   await expect(vacanciesPage.getRows()).not.toHaveCount(0);
   const vacancy = await vacanciesPage.readFirstVacancy();
-  await vacanciesPage.selectJobTitle(vacancy.jobTitle);
   await vacanciesPage.selectVacancy(vacancy.name);
+  await vacanciesPage.search();
+
+  await expect(vacanciesPage.getRows()).not.toHaveCount(0);
+  const rowCount = await vacanciesPage.getRows().count();
+  for (let rowIndex = 0; rowIndex < rowCount; rowIndex++) {
+    await expect.soft(vacanciesPage.getResultVacancyName(rowIndex)).toHaveText(vacancy.name);
+  }
+});
+
+test('vacancy search returns records matching the selected status', async ({
+  loginPage, credentials, vacanciesPage,
+}) => {
+  await loginPage.goto();
+  await loginPage.login(credentials);
+  await loginPage.waitForDashboard();
+  await vacanciesPage.open();
+
+  await expect(vacanciesPage.getRows()).not.toHaveCount(0);
+  const vacancy = await vacanciesPage.readFirstVacancy();
   await vacanciesPage.selectStatus(vacancy.status);
   await vacanciesPage.search();
 
-  await expect(vacanciesPage.getRows()).toHaveCount(1);
-  await expect.soft(vacanciesPage.getResultVacancyName()).toHaveText(vacancy.name);
-  await expect.soft(vacanciesPage.getResultJobTitle()).toHaveText(vacancy.jobTitle);
-  await expect.soft(vacanciesPage.getResultStatus()).toHaveText(vacancy.status);
+  await expect(vacanciesPage.getRows()).not.toHaveCount(0);
+  const rowCount = await vacanciesPage.getRows().count();
+  for (let rowIndex = 0; rowIndex < rowCount; rowIndex++) {
+    await expect.soft(vacanciesPage.getResultStatus(rowIndex)).toHaveText(vacancy.status);
+  }
 });
 
 test('vacancy search returns no records for a vacancy with the opposite status', async ({
@@ -30,7 +68,7 @@ test('vacancy search returns no records for a vacancy with the opposite status',
   await vacanciesPage.open();
 
   await expect(vacanciesPage.getRows()).not.toHaveCount(0);
-  const vacancy = await vacanciesPage.readFirstVacancy();
+  const vacancy = await vacanciesPage.readVacancyWithAvailableJobTitle();
   const oppositeStatus = vacancy.status === 'Active' ? 'Closed' : 'Active';
   await vacanciesPage.selectJobTitle(vacancy.jobTitle);
   await vacanciesPage.selectVacancy(vacancy.name);

@@ -44,16 +44,16 @@ export class VacanciesPage {
     return this.rows;
   }
 
-  getResultVacancyName(): Locator {
-    return this.resultVacancyName;
+  getResultVacancyName(rowIndex = 0): Locator {
+    return this.rows.nth(rowIndex).getByRole('cell').nth(1);
   }
 
-  getResultJobTitle(): Locator {
-    return this.resultJobTitle;
+  getResultJobTitle(rowIndex = 0): Locator {
+    return this.rows.nth(rowIndex).getByRole('cell').nth(2);
   }
 
-  getResultStatus(): Locator {
-    return this.resultStatus;
+  getResultStatus(rowIndex = 0): Locator {
+    return this.rows.nth(rowIndex).getByRole('cell').nth(4);
   }
 
   getVacancyDropdown(): Locator {
@@ -69,7 +69,11 @@ export class VacanciesPage {
   }
 
   async open(): Promise<void> {
-    await this.recruitmentLink.click();
+    // Keep the redirect chain on the navigation budget, separate from actionability.
+    await Promise.all([
+      this.page.waitForURL('/web/index.php/recruitment/viewCandidates', { waitUntil: 'domcontentloaded' }),
+      this.recruitmentLink.click({ timeout: 30_000 }),
+    ]);
     await this.vacanciesLink.click();
     await this.resultHeader.waitFor({ state: 'visible' });
   }
@@ -87,6 +91,30 @@ export class VacanciesPage {
   async selectJobTitle(jobTitle: string): Promise<void> {
     await this.jobTitleDropdown.click();
     await this.page.getByRole('option', { name: jobTitle, exact: true }).click();
+  }
+
+  async readVacancyWithAvailableJobTitle(): Promise<{ name: string; jobTitle: string; status: VacancyStatus }> {
+    await this.tableLoader.waitFor({ state: 'hidden' });
+    await this.jobTitleDropdown.click();
+    const options = this.page.getByRole('option');
+    await options.first().waitFor({ state: 'visible' });
+    const availableJobTitles = new Set((await options.allTextContents()).map(title => title.trim()));
+    await this.jobTitleDropdown.click();
+
+    const rowCount = await this.rows.count();
+    for (let rowIndex = 0; rowIndex < rowCount; rowIndex++) {
+      const jobTitle = await this.getResultJobTitle(rowIndex).innerText();
+      if (!availableJobTitles.has(jobTitle)) {
+        continue;
+      }
+      const name = await this.getResultVacancyName(rowIndex).innerText();
+      const status = await this.getResultStatus(rowIndex).innerText();
+      if (status !== 'Active' && status !== 'Closed') {
+        throw new Error(`Unsupported vacancy status in the live results: "${status}".`);
+      }
+      return { name, jobTitle, status };
+    }
+    throw new Error('No displayed vacancy has a job title available in the Job Title filter.');
   }
 
   async selectVacancy(name: string): Promise<void> {
