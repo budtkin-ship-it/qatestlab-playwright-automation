@@ -1,30 +1,39 @@
 import { test, expect } from '../fixtures/test';
+import type { UserStatus } from '../types/user';
+import { USER_ROLE, INITIAL_STATUS } from '../constants/user';
 
-test('create, update, and delete a system user', async ({
-  loginPage, credentials, usersPage, userFormPage, userAccount,
-}) => {
-  await loginPage.goto();
-  await loginPage.login(credentials);
-  await loginPage.waitForDashboard();
-  await usersPage.open();
+// User management tests include several operations, such as user creation,
+// updating, deletion, and cleanup. These operations can take longer than
+// other tests on the demo site, so we increase the timeout only for these tests.
+test.describe.configure({ timeout: 120_000 });
 
-  await usersPage.addUser();
-  const employeeName = await userFormPage.createUser(userAccount, 'ESS', 'Enabled');
-  await usersPage.search(userAccount.username);
-  await expect(usersPage.userRow(userAccount.username)).toHaveCount(1);
-  await expect.soft(usersPage.userRole(userAccount.username)).toHaveText('ESS');
-  await expect.soft(usersPage.userEmployee(userAccount.username)).toHaveText(employeeName);
-  await expect.soft(usersPage.userStatus(userAccount.username)).toHaveText('Enabled');
+const UPDATED_STATUS: UserStatus = 'Disabled';
 
-  await usersPage.editUser(userAccount.username);
-  await expect(userFormPage.getUsernameInput()).toHaveValue(userAccount.username);
-  await userFormPage.selectStatus('Disabled');
+// In 'create a system user' test I use a fixture to avoid repeating user creation code.
+// Creating the user directly in this test would be easier to read,
+// but I chose to keep the shared setup.
+test('create a system user', async ({ usersPage, createdUser }) => {
+  await expect(usersPage.userRow(createdUser.username)).toHaveCount(1);
+  await expect.soft(usersPage.userRole(createdUser.username)).toHaveText(USER_ROLE);
+  await expect.soft(usersPage.userEmployee(createdUser.username)).toHaveText(createdUser.employeeName);
+  await expect.soft(usersPage.userStatus(createdUser.username)).toHaveText(INITIAL_STATUS);
+});
+
+test('update a system user', async ({ usersPage, userFormPage, createdUser }) => {
+  await expect(usersPage.userRow(createdUser.username)).toHaveCount(1);
+  await expect(usersPage.userStatus(createdUser.username)).toHaveText(INITIAL_STATUS);
+  await usersPage.editUser(createdUser.username);
+  await expect(userFormPage.getUsernameInput()).toHaveValue(createdUser.username);
+  await userFormPage.selectStatus(UPDATED_STATUS);
   await userFormPage.save();
-  await usersPage.search(userAccount.username);
-  await expect.soft(usersPage.userStatus(userAccount.username)).toHaveText('Disabled');
+  await usersPage.search(createdUser.username);
+  await expect.soft(usersPage.userStatus(createdUser.username)).toHaveText(UPDATED_STATUS);
+});
 
-  await usersPage.deleteUser(userAccount.username);
-  await usersPage.search(userAccount.username);
+test('delete a system user', async ({ usersPage, createdUser }) => {
+  await expect(usersPage.userRow(createdUser.username)).toHaveCount(1);
+  await usersPage.deleteUser(createdUser.username);
+  await usersPage.search(createdUser.username);
   await expect.soft(usersPage.getNoRecordsMessage()).toBeVisible();
-  await expect.soft(usersPage.userRow(userAccount.username)).toHaveCount(0);
+  await expect.soft(usersPage.userRow(createdUser.username)).toHaveCount(0);
 });

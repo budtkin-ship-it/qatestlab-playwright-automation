@@ -8,6 +8,7 @@ import { UsersPage } from '../pages/users/users.page';
 import { UserFormPage } from '../pages/users/user-form.page';
 import { VacanciesPage } from '../pages/vacancies.page';
 import { getCredentials, type Credentials } from '../test-data/credentials';
+import { USER_ROLE, INITIAL_STATUS } from '../constants/user';
 
 interface TestFixtures {
   loginPage: LoginPage;
@@ -17,6 +18,10 @@ interface TestFixtures {
   usersPage: UsersPage;
   userFormPage: UserFormPage;
   userAccount: Credentials;
+  createdUser: {
+    username: string;
+    employeeName: string;
+  };
   attachmentsPage: AttachmentsPage;
   attachmentFile: {
     name: string;
@@ -62,6 +67,18 @@ export const test = base.extend<TestFixtures>({
       await usersPage.deleteUserIfExists(user.username);
     }
   }, { timeout: 30_000 }],
+
+  createdUser: async ({ loginPage, credentials, usersPage, userFormPage, userAccount }, use) => {
+    // The dependent userAccount fixture owns this test's username and failure cleanup.
+    await loginPage.goto();
+    await loginPage.login(credentials);
+    await loginPage.waitForDashboard();
+    await usersPage.open();
+    await usersPage.addUser();
+    const employeeName = await userFormPage.createUser(userAccount, USER_ROLE, INITIAL_STATUS);
+    await usersPage.search(userAccount.username);
+    await use({ username: userAccount.username, employeeName });
+  },
 
   attachmentsPage: async ({ page }, use) => {
     await use(new AttachmentsPage(page));
