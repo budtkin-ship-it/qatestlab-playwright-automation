@@ -1,5 +1,4 @@
 import type { Download, Locator, Page } from '@playwright/test';
-import path from 'node:path';
 
 export class AttachmentsPage {
   private readonly attachmentsSection: Locator;
@@ -12,7 +11,6 @@ export class AttachmentsPage {
   private readonly saveButton: Locator;
   private readonly confirmDeleteButton: Locator;
   private readonly deleteSuccessMessage: Locator;
-  private submittedFilename?: string;
 
   constructor(private readonly page: Page) {
     this.attachmentsSection = page.locator('.orangehrm-attachment');
@@ -47,7 +45,6 @@ export class AttachmentsPage {
     await this.addButton.click();
     await this.fileInput.setInputFiles(filePath);
     await this.commentInput.fill(description);
-    this.submittedFilename = path.basename(filePath);
     await this.saveButton.click();
     await this.heading.waitFor({ state: 'visible' });
   }
@@ -69,9 +66,6 @@ export class AttachmentsPage {
   }
 
   async deleteAttachmentIfExists(filename: string): Promise<void> {
-    if (this.submittedFilename !== filename) {
-      return;
-    }
     await this.open();
     if (await this.attachmentRow(filename).count() > 0) {
       await this.deleteAttachment(filename);
