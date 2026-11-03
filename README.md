@@ -33,6 +33,13 @@ $env:PLAYWRIGHT_BROWSERS_PATH = '0'
 npx playwright install chromium
 ```
 
+**Windows CMD:**
+
+```cmd
+set "PLAYWRIGHT_BROWSERS_PATH=0"
+npx playwright install chromium
+```
+
 **macOS/Linux:**
 
 ```sh
@@ -65,9 +72,10 @@ displayed on the login page. Use an Admin account for the complete suite.
 `BASE_URL` defaults to the public demo. The file loads automatically; existing
 shell/CI variables take precedence. Never commit `.env` or authentication data.
 
-Local runs open visible Chromium windows, including direct `npx playwright test`
-commands. Leave `CI` unset locally; `CI=true` enables headless mode and two
-retries. Local runs have no retries. No CI workflow is included.
+`npm test` runs in headed mode locally, with visible Chromium windows and no
+retries. Direct `npx playwright test` commands use the same defaults. Leave `CI`
+unset locally. In CI, setting `CI=true` runs tests in headless mode with two
+retries. No CI workflow is included.
 
 ```sh
 # Run the complete suite
@@ -101,7 +109,9 @@ pages/                   # UI locators and actions
 fixtures/test.ts         # Page fixtures, test data, and cleanup
 test-data/credentials.ts # Environment-backed credentials
 utils/env.ts             # .env loading and required-value checks
-utils/routes.ts          # Shared application routes
+constants/routes.ts      # Shared application routes
+constants/user.ts        # Shared user test constants
+types/                   # Shared User and Vacancy types
 playwright.config.ts     # Browser, timeouts, retries, and reporters
 tsconfig.json            # Strict TypeScript settings
 package-lock.json        # Locked dependency versions
@@ -122,6 +132,7 @@ package-lock.json        # Locked dependency versions
   or backend totals. Sub Unit expects Engineering/Unassigned; Location expects
   Texas R&D/Unassigned. Cross-category labels must be absent. Organization
   changes can invalidate these expectations; employee counts are not fixed.
-- Vacancy tests read the first live record and require a selectable job title,
-  an unambiguous vacancy name, and Active/Closed status. Concurrent edits can
-  invalidate the captured values. Searches are read-only and need no cleanup.
+- Vacancy tests use live records and require an unambiguous vacancy name and
+  Active/Closed status. Job Title filtering selects a vacancy whose job title
+  is available in the dropdown. Concurrent edits can invalidate test data.
+  Searches are read-only and need no cleanup.
