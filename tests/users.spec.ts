@@ -1,14 +1,15 @@
 import { test, expect } from '../fixtures/test';
 
 test('create, update, and delete a system user', async ({
-  loginPage, credentials, usersPage, userAccount,
+  loginPage, credentials, usersPage, userFormPage, userAccount,
 }) => {
   await loginPage.goto();
   await loginPage.login(credentials);
   await loginPage.waitForDashboard();
   await usersPage.open();
 
-  const employeeName = await usersPage.createUser(userAccount, 'ESS', 'Enabled');
+  await usersPage.addUser();
+  const employeeName = await userFormPage.createUser(userAccount, 'ESS', 'Enabled');
   await usersPage.search(userAccount.username);
   await expect(usersPage.userRow(userAccount.username)).toHaveCount(1);
   await expect.soft(usersPage.userRole(userAccount.username)).toHaveText('ESS');
@@ -16,9 +17,9 @@ test('create, update, and delete a system user', async ({
   await expect.soft(usersPage.userStatus(userAccount.username)).toHaveText('Enabled');
 
   await usersPage.editUser(userAccount.username);
-  await expect(usersPage.getUsernameInput()).toHaveValue(userAccount.username);
-  await usersPage.selectStatus('Disabled');
-  await usersPage.save();
+  await expect(userFormPage.getUsernameInput()).toHaveValue(userAccount.username);
+  await userFormPage.selectStatus('Disabled');
+  await userFormPage.save();
   await usersPage.search(userAccount.username);
   await expect.soft(usersPage.userStatus(userAccount.username)).toHaveText('Disabled');
 

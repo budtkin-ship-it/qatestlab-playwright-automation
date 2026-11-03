@@ -4,7 +4,8 @@ import { writeFile } from 'node:fs/promises';
 import { AttachmentsPage } from '../pages/attachments.page';
 import { DashboardPage } from '../pages/dashboard.page';
 import { LoginPage } from '../pages/login.page';
-import { UsersPage } from '../pages/users.page';
+import { UsersPage } from '../pages/users/users.page';
+import { UserFormPage } from '../pages/users/user-form.page';
 import { VacanciesPage } from '../pages/vacancies.page';
 import { getCredentials, type Credentials } from '../test-data/credentials';
 
@@ -14,6 +15,7 @@ interface TestFixtures {
   dashboardPage: DashboardPage;
   vacanciesPage: VacanciesPage;
   usersPage: UsersPage;
+  userFormPage: UserFormPage;
   userAccount: Credentials;
   attachmentsPage: AttachmentsPage;
   attachmentFile: {
@@ -43,6 +45,10 @@ export const test = base.extend<TestFixtures>({
 
   usersPage: async ({ page }, use) => {
     await use(new UsersPage(page));
+  },
+
+  userFormPage: async ({ page }, use) => {
+    await use(new UserFormPage(page));
   },
 
   userAccount: [async ({ usersPage }, use) => {
