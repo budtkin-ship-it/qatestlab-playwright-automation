@@ -1,6 +1,6 @@
 import type { Locator, Page } from '@playwright/test';
 import type { Credentials } from '../test-data/credentials';
-import { routes } from '../utils/routes';
+import { routes } from '../constants/routes';
 
 export class LoginPage {
   private readonly heading: Locator;

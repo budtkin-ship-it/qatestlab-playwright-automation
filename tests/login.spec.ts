@@ -1,5 +1,5 @@
 import { test, expect } from '../fixtures/test';
-import { routes } from '../utils/routes';
+import { routes } from '../constants/routes';
 
 test('valid user can log in', async ({ page, loginPage, credentials }) => {
   await loginPage.goto();
