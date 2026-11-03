@@ -1,6 +1,5 @@
 import type { Locator, Page } from '@playwright/test';
-
-type VacancyStatus = 'Active' | 'Closed';
+import type { VacancyStatus } from '../types/vacancy';
 
 export class VacanciesPage {
   private readonly rows: Locator;
